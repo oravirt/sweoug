@@ -122,7 +122,7 @@
     #   tags:
     #    - oscheck
 
-    - name: Install packages required by Oracle on OL/RHEL
+    - name: Install packages
       yum: name={{ item }} state=installed
       with_items: "{{os_packages}}"
       tags: os_packages, oscheck
@@ -161,14 +161,6 @@
       tags:
         - user
 
-    - name: Create directories
-      file: path={{ item }} state=directory owner={{ oracle_user.name }} group={{ oracle_user.primgroup }} mode=775
-      with_items:
-           - "{{ oracle_home }}"
-           - "{{ oracle_stage_directory }}"
-           - "{{ oracle_stage_directory }}/{{ oracle_db.version }}"
-      tags: directories
-
     - name: Kernel settings
       sysctl: name={{ item.name }} value="{{ item.value }}" state=present reload=yes
       with_items: "{{oracle_sysctl}}"
@@ -183,6 +175,14 @@
       tags: seclimit
 
 ############ Oracle installation ###################
+
+    - name: Create directories
+      file: path={{ item }} state=directory owner={{ oracle_user.name }} group={{ oracle_user.primgroup }} mode=775
+      with_items:
+          - "{{ oracle_home }}"
+          - "{{ oracle_stage_directory }}"
+          - "{{ oracle_stage_directory }}/{{ oracle_db.version }}"
+      tags: directories
 
     - name: Extract files to stage-area
       unarchive: src={{ item.path }}/{{ item.name }}  dest={{ oracle_stage_directory }}/{{ oracle_db.version }} copy=no
@@ -209,16 +209,22 @@
           creates: "{{ oracle_home }}/root.sh"
       become: true
       become_user: "{{ oracle_user.name }}"
-      tags:
-        - oraswdb_install
+      tags: oraswdb_install
       register: oradbinstall
+
+    - name: Print output from Oracle Server installation
+      debug: var=oradbinstall.stdout_lines
+      when: oradbinstall.changed
+
+    - name: Run oraInst.sh
+      shell: "{{ oracle_inventory_loc }}/orainstRoot.sh"
+      when: oradbinstall.changed
+      tags: oraswdb_install,orainstsh
 
     - name: Run root.sh
       shell: "{{ oracle_home }}/root.sh"
       when: oradbinstall.changed
-      tags:
-        - oraswdb_install
-
+      tags: oraswdb_install,rootsh
 
     - name: Add .profile for Oracle installation
       template: src=dotprofile.j2 dest=/home/{{ oracle_user.name }}/.profile_{{ oracle_db.name }}
@@ -258,15 +264,15 @@
     - name: Create database
       shell: "{{ oracle_home }}/bin/dbca -responseFile {{ oracle_stage_directory }}/dbca-{{ oracle_db.name }}.rsp -silent"
       args:
-          creates: "{{ oracle_db.datafile_dest }}/{{ oracle_db.name}}"
+         creates: "{{ oracle_db.datafile_dest }}/{{ oracle_db.name}}"
       become: true
       become_user: "{{ oracle_user.name }}"
       tags: create_db
-      register: createdb
+      register: create_db
 
     - name: Print output from Create database
-      debug: var={{ createdb }}
+      debug: var=create_db.stdout_lines
       become: true
       become_user: "{{ oracle_user.name }}"
-      when: create_db is defined
+      when: create_db.changed
       tags: create_db

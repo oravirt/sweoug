@@ -1,0 +1,37 @@
+---
+# tasks file for oracle-database
+- name: Create responsefile for listener configuration
+  template: src=netca.rsp.j2 dest={{ oracle_stage_directory }}/netca.rsp
+  become: true
+  become_user: "{{ oracle_user.name }}"
+  tags: responsefile_netca, listener_install
+
+- name: Create responsefile for database creation
+  template: src=dbca.rsp.j2 dest={{ oracle_stage_directory }}/dbca-{{ oracle_db.name }}.rsp
+  become: true
+  become_user: "{{ oracle_user.name }}"
+  tags: responsefile_db, create_db
+
+- name: Create listener
+  shell: "{{ oracle_home }}/bin/netca -responseFile {{ oracle_stage_directory }}/netca.rsp -silent"
+  args:
+      creates: "{{ oracle_home }}/network/admin/listener.ora"
+  become: true
+  become_user: "{{ oracle_user.name }}"
+  tags: listener_install
+
+- name: Create database
+  shell: "{{ oracle_home }}/bin/dbca -responseFile {{ oracle_stage_directory }}/dbca-{{ oracle_db.name }}.rsp -silent"
+  args:
+      creates: "{{ oracle_db.datafile_dest }}/{{ oracle_db.name}}"
+  become: true
+  become_user: "{{ oracle_user.name }}"
+  tags: create_db
+  register: create_db
+
+- name: Print output from Create database
+  debug: var=create_db.stdout_lines
+  become: true
+  become_user: "{{ oracle_user.name }}"
+  when: create_db.changed
+  tags: create_db

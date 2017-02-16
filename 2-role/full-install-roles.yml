@@ -1,0 +1,8 @@
+- name: Full installation
+  hosts: all
+  become: yes
+  roles:
+     - host
+     - oracle-server
+     - oracle-database
+     
