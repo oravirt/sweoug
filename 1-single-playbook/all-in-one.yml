@@ -22,6 +22,10 @@
            listener_protocols: TCP
            listener_port: 1521
 
+     oracle_env:
+            ORACLE_HOME: "{{ oracle_home }}"
+            LD_LIBRARY_PATH: "{{ oracle_home }}/lib"
+
      oracle_stage_directory: /u01/stage
      oracle_binaries:
             - {name: linuxamd64_12102_database_1of2.zip, path: /media/swrepo/ }
@@ -130,12 +134,12 @@
     - name: Disable firewall
       service: name=firewalld state=stopped enabled=no
 
-    - name: Disable selinux (permanently)
-      selinux: state=disabled
-
-    - name: Disable selinux (runtime)
-      shell: setenforce 0
-      ignore_errors: true
+    # - name: Disable selinux (permanently)
+    #   selinux: state=disabled
+    #
+    # - name: Disable selinux (runtime)
+    #   shell: setenforce 0
+    #   ignore_errors: true
 
     - name: Check dns for host
       command: nslookup {{ ansible_hostname }}
@@ -276,3 +280,17 @@
       become_user: "{{ oracle_user.name }}"
       when: create_db.changed
       tags: create_db
+
+############ Install cx_Oracle ###################
+
+    - name: Copy cx_Oracle RPM
+      copy: src=files/cx_Oracle-5.2.1-12c-py27-1.x86_64.rpm dest={{ oracle_stage_directory }}/
+      become: true
+      tags: cx_oracle
+
+
+    - name: Install cx_Oracle
+      yum: name={{ oracle_stage_directory }}/cx_Oracle-5.2.1-12c-py27-1.x86_64.rpm state=present
+      become: true
+      environment: "{{ oracle_env }}"
+      tags: cx_oracle

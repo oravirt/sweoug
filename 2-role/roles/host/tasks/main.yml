@@ -8,12 +8,12 @@
 - name: Disable firewall
   service: name=firewalld state=stopped enabled=no
 
-- name: Disable selinux (permanently)
-  selinux: state=disabled
-
-- name: Disable selinux (runtime)
-  shell: setenforce 0
-  ignore_errors: true
+# - name: Disable selinux (permanently)
+#   selinux: state=disabled
+#
+# - name: Disable selinux (runtime)
+#   shell: setenforce 0
+#   ignore_errors: true
 
 - name: Check dns for host
   command: nslookup {{ ansible_hostname }}

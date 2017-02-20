@@ -3,7 +3,7 @@ oracle_db:
       name: sweoug
       passwd: Oracle123
       version: 12.1.0.2
-      cdb: false
+      cdb: true
       total_mb: 1024
       characterset: AL32UTF8
       ncharacterset: AL16UTF16
@@ -24,3 +24,7 @@ oracle_user:
       dbagroup: swedba
       othergroups: swedba
       passwd: "$6$0xHoAXXF$K75HKb64Hcb/CEcr3YEj2LGERi/U2moJgsCK.ztGxLsKoaXc4UBiNZPL0hlxB5ng6GL.gyipfQOOXplzcdgvD0"
+
+oracle_env:
+      ORACLE_HOME: "{{ oracle_home }}"
+      LD_LIBRARY_PATH: "{{ oracle_home }}/lib"
