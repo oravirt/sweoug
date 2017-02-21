@@ -6,6 +6,7 @@ oracle_db:
       passwd: Oracle123
       version: 12.1.0.2
       cdb: True
+      sample_schema: false
       total_mb: 1024
       characterset: AL32UTF8
       ncharacterset: AL16UTF16

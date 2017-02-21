@@ -1,0 +1,5 @@
+- name: Create pdb
+  oracle_pdb: name={{ oracle_db.pdb }} sourcedb={{ oracle_db.name }}  state=present host={{ inventory_hostname }} un={{ user }} pw={{ oracle_db.passwd }} sn={{ oracle_db.name }}
+  environment: oracle_env
+  with_items: pdb
+  tags: pdb

@@ -1,0 +1,17 @@
+- name: Create tablespace
+  oracle_tablespace:
+             hostname={{ inventory_hostname }}
+             service_name={{ oracle_db.pdb }}
+             user={{ user }}
+             password={{ oracle_db.passwd }}
+             tablespace={{ item.name }}
+             size={{ item.size }}
+             bigfile={{ item.bigfile }}
+             autoextend={{ item.autoextend }}
+             next={{ item.next }}
+             maxsize={{ item.maxsize }}
+             content={{ item.content }}
+             state={{ item.state }}
+  environment: oracle_env
+  with_items: tablespaces
+  tags: tablespace

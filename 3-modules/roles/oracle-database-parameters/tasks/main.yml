@@ -1,0 +1,5 @@
+- name: Set parameters
+  oracle_parameter: hostname={{ inventory_hostname }} service_name={{ item.sn }} user={{ user }} password={{ oracle_db.passwd }} name={{ item.name }} value="{{ item.value }}" state={{ item.state }} scope={{ item.scope }}
+  environment: oracle_env
+  with_items: init_parameters
+  tags: param

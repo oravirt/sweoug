@@ -60,3 +60,16 @@
   become: yes
   become_user: "{{ oracle_user.name }}"
   tags: glogin
+
+
+- name: Copy cx_Oracle RPM
+  copy: src=files/cx_Oracle-5.2.1-12c-py27-1.x86_64.rpm dest={{ oracle_stage_directory }}/
+  become: true
+  tags: cx_oracle
+
+
+- name: Install cx_Oracle
+  yum: name={{ oracle_stage_directory }}/cx_Oracle-5.2.1-12c-py27-1.x86_64.rpm state=present
+  become: true
+  environment: "{{ oracle_env }}"
+  tags: cx_oracle

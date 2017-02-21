@@ -1,0 +1,31 @@
+
+- name: Create services
+  oracle_services:
+        name={{ item.name }}
+        database_name={{ item.dbname }}
+        pi={{ item.pi |default(omit) }}
+        ai={{ item.ai|default(omit) }}
+        pdb={{ item.pdb | default(omit) }}
+        state={{ item.state }}
+        host=localhost
+        port=1521
+        un={{ user }}
+        pw={{ oracle_db.passwd }}
+        sn={{ item.sn }}
+  environment: oracle_env
+  with_items: services
+  tags: create_service,services
+
+- name: Start services
+  oracle_services:
+         name={{ item.name }}
+         database_name={{ item.dbname }}
+         pdb={{ item.pdb | default(omit) }}
+         state=started
+         host={{ inventory_hostname }}
+         un={{ user }}
+         pw={{ oracle_db.passwd }}
+         sn={{ item.sn }}
+  environment: oracle_env
+  with_items: services
+  tags: start_service,services

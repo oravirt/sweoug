@@ -1,0 +1,13 @@
+- name: Create application role
+  oracle_role: hostname={{ inventory_hostname }} service_name={{ oracle_db.pdb }}  user={{ user }} password={{ oracle_db.passwd }} role={{ item.name }} state={{ item.state }}
+  environment: oracle_env
+  with_items: roles
+  tags: role
+
+- name: Add grants to role
+  oracle_grants: hostname={{ inventory_hostname }} service_name={{ oracle_db.pdb }}  user={{ user }} password={{ oracle_db.passwd }} role={{ item.0.name }} grants="{{ item.1 }}" state={{ item.0.state }}
+  environment: oracle_env
+  with_subelements:
+         - roles
+         - role_grants
+  tags: grant

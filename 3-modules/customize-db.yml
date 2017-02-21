@@ -2,7 +2,7 @@
 ---
 - hosts: all
   become: yes
-  become_user: sweora
+  become_user: oracle
   gather_facts: false
 
 
@@ -60,6 +60,7 @@
              grants:
                   - approle1
 
+
       roles:
            - name: approle1
              role_grants:
@@ -67,6 +68,7 @@
                     - select any table
                     - select any dictionary
              state: present
+
 
 
 
@@ -137,14 +139,14 @@
     tags: users
 
 
-  - name: Create Application user
+  - name: Create Application Users
     oracle_user:
             hostname={{ inventory_hostname }}
             service_name={{ oracle_db.pdb }}
             user={{ user }}
             password={{ oracle_db.passwd }}
             schema={{ item.0.schema }}
-            schema_password={{ item.0.schema_password }}
+            schema_password={{ item.0.schema_password | default (omit) }}
             state={{ item.0.state }}
             default_temp_tablespace={{ item.0.default_temp_tablespace }}
             default_tablespace={{ item.0.default_tablespace }}

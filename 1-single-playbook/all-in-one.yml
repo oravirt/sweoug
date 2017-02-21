@@ -103,9 +103,6 @@
            - { name: net.core.wmem_default, value: 262144 }
            - { name: net.core.wmem_max, value: 1048576 }
 
-     oracle_hugepages:
-           - { name: vm.nr_hugepages, value: "{{ nr_hugepages }}" }
-
 
      oracle_seclimits:
            - { name: 'soft nproc', value: 2047 }
@@ -141,15 +138,15 @@
     #   shell: setenforce 0
     #   ignore_errors: true
 
-    - name: Check dns for host
-      command: nslookup {{ ansible_hostname }}
-      register: ns
-      ignore_errors: True
-      tags: etchosts
+    # - name: Check dns for host
+    #   command: nslookup {{ ansible_hostname }}
+    #   register: ns
+    #   ignore_errors: True
+    #   tags: etchosts
 
-    - name: Add host to /etc/hosts if needed
+    - name: Add host to /etc/hosts
       lineinfile: dest=/etc/hosts regexp='.*{{ ansible_fqdn }}$' line="{{ ansible_default_ipv4.address }} {{ ansible_hostname }} {{ ansible_fqdn }}" state=present
-      when: "'find {{ ansible_hostname }}: NXDOMAIN' in ns.stdout or 'find {{ ansible_hostname }}: SERVFAIL' in ns.stdout "
+      #when: "'find {{ ansible_hostname }}: NXDOMAIN' in ns.stdout or 'find {{ ansible_hostname }}: SERVFAIL' in ns.stdout "
       tags: etchosts
 
     - name: Add group(s)

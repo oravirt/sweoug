@@ -24,3 +24,7 @@ oracle_stage_directory: /u01/stage
 oracle_binaries:
        - {name: linuxamd64_12102_database_1of2.zip, path: /media/swrepo/ }
        - {name: linuxamd64_12102_database_2of2.zip, path: /media/swrepo/ }
+
+oracle_env:
+     ORACLE_HOME: "{{ oracle_home }}"
+     LD_LIBRARY_PATH: "{{ oracle_home }}/lib"
